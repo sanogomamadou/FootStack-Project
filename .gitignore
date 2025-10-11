@@ -18,3 +18,11 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+# Ajoute ces lignes à ton .gitignore
+airflow/logs/
+airflow/airflow.cfg
+data/features_dataset.csv
+models/
+*.pyc
+__pycache__/
+.venv/

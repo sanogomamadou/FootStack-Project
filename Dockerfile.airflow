@@ -1,0 +1,9 @@
+FROM apache/airflow:2.7.1
+
+# Copier ton requirements
+COPY requirementsairflow.txt .
+
+# Installer les packages Python pour airflow dans son home
+USER airflow
+ENV PATH=/home/airflow/.local/bin:$PATH
+RUN pip install --user --no-cache-dir -r requirementsairflow.txt

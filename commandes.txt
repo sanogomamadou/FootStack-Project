@@ -2,7 +2,12 @@ Activation venv:
 .venv\Scripts\Activate.ps1   
 
 exemple ingestion de données:
-python -m data_ingest.ingest --ingest-matches 2015 --days-back 730          
+ python -m data_ingest.ingest --ingest-matches 2015 --days-back 730                                           
+python -m data_ingest.ingest --ingest-matches 2001 --days-back 730                       
+python -m data_ingest.ingest --ingest-matches 2021 --days-back 730                                                       " 
+python -m data_ingest.ingest --ingest-matches 2002 --days-back 730                                                     
+python -m data_ingest.ingest --ingest-matches 2014 --days-back 730                                          
+python -m data_ingest.ingest --ingest-matches 2019 --days-back 730                                                   
 
 Vérifier le contenu de la BDD: 
 docker exec -it footstack-postgres-1 psql -U postgres -d footstack
