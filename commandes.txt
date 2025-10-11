@@ -1,5 +1,40 @@
+Activation venv:
+.venv\Scripts\Activate.ps1   
 
+exemple ingestion de données:
+python -m data_ingest.ingest --ingest-matches 2015 --days-back 730          
 
 Vérifier le contenu de la BDD: 
 docker exec -it footstack-postgres-1 psql -U postgres -d footstack
 SELECT * FROM matches ORDER BY utc_date DESC LIMIT 10;
+
+
+
+
+VUES et TABLES CREES:
+
+DROP TABLE IF EXISTS matches_cleaned;
+
+CREATE TABLE matches_cleaned AS
+SELECT
+    m.id AS match_id,
+    m.competition_id,
+    m.utc_date::timestamp AS date,
+    (m.raw -> 'competition' ->> 'name') AS competition_name,
+    (m.raw -> 'season' ->> 'startDate') AS season_start,
+    (m.raw -> 'season' ->> 'endDate') AS season_end,
+    (m.raw -> 'homeTeam' ->> 'name') AS home_team,
+    (m.raw -> 'awayTeam' ->> 'name') AS away_team,
+    (m.score -> 'fullTime' ->> 'home')::int AS home_score,
+    (m.score -> 'fullTime' ->> 'away')::int AS away_score,
+    CASE 
+        WHEN (m.score ->> 'winner') = 'HOME_TEAM' THEN 'Home'
+        WHEN (m.score ->> 'winner') = 'AWAY_TEAM' THEN 'Away'
+        WHEN (m.score ->> 'winner') = 'DRAW' THEN 'Draw'
+        ELSE NULL 
+    END AS result,
+    m.matchday,
+    (m.raw -> 'area' ->> 'name') AS country,
+    (m.raw -> 'stage') AS stage
+FROM matches m
+WHERE m.status = 'FINISHED';

@@ -1,3 +1,4 @@
+# data_ingest/models.py
 from sqlalchemy import Column, Integer, String, Date, DateTime, JSON, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 from .db import Base
