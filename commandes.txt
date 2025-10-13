@@ -12,6 +12,7 @@ python -m data_ingest.ingest --ingest-matches 2019 --days-back 730
 Vérifier le contenu de la BDD: 
 docker exec -it footstack-postgres-1 psql -U postgres -d footstack
 SELECT * FROM matches ORDER BY utc_date DESC LIMIT 10;
+SELECT * FROM players LIMIT 10;
 
 
 
@@ -43,3 +44,10 @@ SELECT
     (m.raw -> 'stage') AS stage
 FROM matches m
 WHERE m.status = 'FINISHED';
+
+
+
+            'Premier League': '9',
+            'La Liga': '12', 
+            'Serie A': '11',
+            'Bundesliga': '20',
