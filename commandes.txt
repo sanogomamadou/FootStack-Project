@@ -47,7 +47,66 @@ WHERE m.status = 'FINISHED';
 
 
 
-            'Premier League': '9',
-            'La Liga': '12', 
-            'Serie A': '11',
-            'Bundesliga': '20',
+FootStack/
+├── .env
+├── .gitignore
+├── README.md
+├── commandes.txt
+├── docker-compose.yml
+├── Dockerfile.airflow
+├── requirements.txt
+├── requirementsairflow.txt
+├── airflow/
+│   ├── dags/
+│   │   └── footstack_pipeline.py
+│   └── logs/
+
+├── api/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── schemas.py
+│   ├── dependencies.py
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── health.py
+│   │   └── predictions.py
+│   └── services/
+│       └── feature_calculator.py
+├── data/
+│   ├── features_dataset.csv
+│   ├── players_stats_complete.csv
+│   └── processed_players.csv
+├── data_ingest/
+│   ├── __init__.py
+│   ├── api_client.py
+│   ├── config.py
+│   ├── db.py
+│   ├── ingest.py
+│   ├── models.py
+│   └── utils.py
+├── images/
+│   ├── DAG_Airflow.jpeg
+│   └── Interface_API_Swagger.jpeg
+├── ml_pipeline/
+│   ├── __init__.py
+│   ├── feature_engineering.py
+│   ├── model_improvement.py
+│   ├── model_training.py
+│   ├── prediction.py
+│   └── predict_upcoming.py
+├── models/
+│   ├── label_encoder_*.joblib
+│   ├── label_encoder_optimized.joblib
+│   ├── random_forest_*.joblib
+│   ├── xgboost_*.joblib
+│   └── xgboost_optimized.joblib
+├── talent_scout/
+│   ├── __init__.py
+│   ├── data_collection/
+│   │   ├── __init__.py
+│   │   ├── data_processor.py
+│   │   └── fbref_scraper.py
+│   └── modeling/
+│       ├── __init__.py
+│       └── clustering.py
+
