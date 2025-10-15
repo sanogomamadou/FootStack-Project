@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text  # AJOUT IMPORTANT
 import uvicorn
 import logging
+from .routes import talent_scout 
 
 # Configuration du logging
 logging.basicConfig(
@@ -43,6 +44,8 @@ app.add_middleware(
 # Inclusion des routes
 app.include_router(health.router)
 app.include_router(predictions.router)
+app.include_router(talent_scout.router)
+
 
 @app.on_event("startup")
 async def startup_event():

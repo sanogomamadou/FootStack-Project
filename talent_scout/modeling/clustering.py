@@ -14,10 +14,19 @@ import sys
 import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+root_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0, root_dir)
 
 logger = logging.getLogger(__name__)
+
+# Imports pour la base de données
+try:
+    from data_ingest.db import SessionLocal
+    from data_ingest.models import PlayerCluster
+    print("✅ Modules data_ingest importés avec succès")
+except ImportError as e:
+    print(f"❌ Erreur import data_ingest: {e}")
+    sys.exit(1)
 
 class PlayerClustering:
     def __init__(self, n_clusters: int = 8, random_state: int = 42):
@@ -268,6 +277,44 @@ class PlayerClustering:
         logger.info(f"📂 Modèle chargé: {filepath}")
         return instance
 
+    def save_clusters_to_database(self, df_clustered: pd.DataFrame):
+        """
+        Sauvegarder les résultats du clustering dans la table player_clusters
+        """
+        logger.info("💾 Sauvegarde des clusters en base de données...")
+        
+        session = SessionLocal()
+        try:
+            # Vider la table existante pour éviter les doublons
+            session.query(PlayerCluster).delete()
+            
+            # Insérer les nouveaux clusters
+            clusters_to_insert = []
+            for _, row in df_clustered.iterrows():
+                # Vérifier que l'ID du joueur existe
+                if pd.notna(row.get('id_info')):
+                    cluster_record = PlayerCluster(
+                        player_id=int(row['id_info']),
+                        cluster_id=int(row['cluster']),
+                        position_group=row.get('position_group', 'Unknown'),
+                        similarity_score=float(1 - row.get('distance_to_centroid', 1.0)),
+                        created_at=datetime.utcnow()
+                    )
+                    clusters_to_insert.append(cluster_record)
+            
+            # Insertion en batch
+            session.bulk_save_objects(clusters_to_insert)
+            session.commit()
+            
+            logger.info(f"✅ {len(clusters_to_insert)} clusters sauvegardés en base de données")
+            
+        except Exception as e:
+            session.rollback()
+            logger.error(f"❌ Erreur sauvegarde clusters en base: {e}")
+            raise
+        finally:
+            session.close()
+
 def run_complete_clustering_pipeline():
     """
     Exécuter le pipeline complet de clustering
@@ -312,7 +359,10 @@ def run_complete_clustering_pipeline():
     df_clustered.to_csv("data/players_with_clusters.csv", index=False)
     cluster_analyzer.save_model()
     
-    # 7. Afficher les résultats
+    # 7. NOUVEAU : Sauvegarder en base de données
+    cluster_analyzer.save_clusters_to_database(df_clustered)
+    
+    # 8. Afficher les résultats
     print("\n" + "="*70)
     print("🎯 RAPPORT DE CLUSTERING - JOUEURS SOUS-ÉVALUÉS")
     print("="*70)
@@ -336,6 +386,15 @@ def run_complete_clustering_pipeline():
     print(f"   • Total joueurs clusterisés: {len(df_clustered)}")
     print(f"   • Joueurs sous-évalués identifiés: {len(undervalued_players)}")
     print(f"   • Score moyen des sous-évalués: {undervalued_players['undervalued_score'].mean():.3f}")
+    
+    # Vérification base de données
+    try:
+        session = SessionLocal()
+        cluster_count = session.query(PlayerCluster).count()
+        session.close()
+        print(f"   • Clusters en base de données: {cluster_count}")
+    except Exception as e:
+        print(f"   • ❌ Erreur vérification base: {e}")
     
     print(f"\n💡 INTERPRÉTATION:")
     print("   • Score > 0.8: Très sous-évalué - forte recommandation")

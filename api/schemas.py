@@ -59,3 +59,51 @@ class TeamsResponse(BaseModel):
     """Schéma pour la liste des équipes"""
     count: int
     teams: List[str]
+
+
+# Dans api/schemas.py - Ajouter à la fin
+
+class PlayerClusterBase(BaseModel):
+    player_name: str
+    team: str
+    position_group: str
+    goals_per90: float
+    assists_per90: float
+    goal_contrib_per90: float
+    cluster_id: int
+    undervalued_score: float
+
+class UndervaluedPlayerResponse(PlayerClusterBase):
+    performance_score: float
+    minutes_played: int
+
+class TopPlayer(BaseModel):
+    player_name: str
+    team: str
+    position_group: str
+    goals_per90: float
+    assists_per90: float
+
+class ClusterAnalysisResponse(BaseModel):
+    cluster_id: int
+    size: int
+    avg_goals_per90: float
+    avg_assists_per90: float
+    avg_goal_contrib_per90: float
+    main_positions: Dict[str, int]
+    top_teams: Dict[str, int]
+    top_players: List[TopPlayer]
+    description: str
+
+class PlayerSearchResponse(PlayerClusterBase):
+    minutes_played: int
+    nationality: str
+    age: Optional[int] = None
+    similar_players: Optional[List[Dict]] = None
+    cluster_ranking: Optional[str] = None
+
+class SimilarPlayer(BaseModel):
+    player_name: str
+    team: str
+    goals_per90: float
+    similarity_score: float
