@@ -1,6 +1,3 @@
-Parfait ! Voici le README mis à jour avec les résultats détaillés des modèles et l'analyse comparative :
-
-```markdown
 # 🚀 FootStack - Plateforme Complète d'Intelligence Footballistique
 
 ![FootStack Architecture](images/architecture-overview.png)
@@ -33,7 +30,6 @@ Parfait ! Voici le README mis à jour avec les résultats détaillés des modèl
 - **Matchs historiques** : 10,000+
 - **Temps de traitement** : < 5 minutes pour le re-entraînement
 
-![Dashboard FootStack](images/dashboard-preview.png)
 
 ## 🏗️ Architecture du Système
 
@@ -134,6 +130,8 @@ FootStack/
 - **Profils types** : Buteurs prolifiques, Créateurs de jeu, Polyvalents
 
 #### 🌐 API Talent Scout Complète
+![Prédictions API](images/Interface_API_talent.jpeg)
+
 ```bash
 # Joueurs sous-évalués
 GET /talent-scout/undervalued?limit=15&min_score=0.6
@@ -155,7 +153,6 @@ GET /talent-scout/players/Messi
 - **Collecte données** - Tous les 14 jours
 - **Nettoyage** - Transformation et feature engineering
 - **Entraînement** - Re-entraînement des modèles
-- **Clustering** - Mise à jour des groupes de joueurs
 
 #### 🛠️ Tâches Spécialisées
 ```python
@@ -184,7 +181,6 @@ start → wait_for_db → ingest_data → clean_data
 ### 📋 Pré-requis
 - Docker et Docker Compose
 - Clé API Football-Data.org
-- 4GB RAM minimum
 
 ### 🐳 Démarrage Rapide
 ```bash
@@ -227,21 +223,7 @@ services:
   airflow-postgres:   # Métadata Airflow  
   airflow-webserver:  # Interface Airflow
   airflow-scheduler:  # Planificateur Airflow
-```
 
-### 🧪 Tests et Validation
-```bash
-# Tester l'API
-curl -X GET "http://localhost:8000/health"
-
-# Tester une prédiction
-curl -X POST "http://localhost:8000/predictions/predict-auto" \
-  -H "Content-Type: application/json" \
-  -d '{"home_team": "Paris SG", "away_team": "Marseille"}'
-
-# Vérifier Airflow
-docker-compose exec airflow-webserver airflow dags list
-```
 
 ## 🔧 Modules Détaillés
 
@@ -251,21 +233,6 @@ docker-compose exec airflow-webserver airflow dags list
 - **Football-Data.org** : Matchs en temps réel, classements
 - **FBref** : Statistiques détaillées des joueurs (scraping)
 - **Périmètre** : Top 5 leagues européennes (2020-2024)
-
-#### Modèles de Données
-```python
-class Match(Base):
-    # Matchs avec scores, statuts, métadonnées
-    id, competition_id, home_team_id, away_team_id, score, status
-
-class Player(Base):
-    # Profils joueurs avec métadonnées
-    name, position, team, age, nationality, fbref_id
-
-class PlayerStats(Base):
-    # Statistiques détaillées par saison
-    goals, assists, minutes_played, goals_per90, assists_per90
-```
 
 #### Pipeline de Collecte
 ```python
@@ -295,7 +262,7 @@ features = {
 ```
 
 #### Modèles Implémentés
-- **XGBoost Optimisé** : Meilleure performance (49.73% accuracy)
+- **XGBoost Optimisé** : Meilleure performance
 - **Random Forest** : Baseline robuste
 - **Optimisation** : GridSearchCV pour hyperparamètres
 
@@ -315,132 +282,7 @@ features = {
 4. Application K-means
 5. Analyse des clusters
 6. Identification joueurs sous-évalués
-```
 
-#### Score de Sous-évaluation
-```python
-undervalued_score = (
-    performance_score * 0.7 +
-    (1 - distance_to_centroid) * 0.3  # Atypicalité
-)
-```
-
-#### Catégories de Joueurs Identifiées
-1. **Buteurs Prolifiques** : Haute efficacité offensive
-2. **Créateurs de Jeu** : Forte contribution aux passes décisives  
-3. **Polyvalents** : Contribution équilibrée buts/passes
-4. **Spécialistes** : Profils niches spécifiques
-
-### ⚙️ Orchestration Airflow
-
-#### DAG Principal
-```python
-with DAG('footstack_pipeline', schedule_interval='0 0 */14 * *') as dag:
-    tasks = [
-        'wait_for_database',      # Attente DB
-        'ingest_all_competitions', # Collecte données
-        'clean_data',             # Nettoyage
-        'engineer_features',      # Feature engineering  
-        'train_models',           # Entraînement ML
-        'optimize_models'         # Optimisation
-    ]
-```
-
-#### Gestion des Dépendances
-- **Health Checks** : Vérification disponibilité services
-- **Gestion d'erreurs** : Retries et alertes
-- **Parallelisation** : Tâches indépendantes quand possible
-
-### 🚀 API FastAPI
-
-#### Architecture RESTful
-```python
-# Structure modulaire
-api/
-├── main.py              # Application principale
-├── schemas.py           # Modèles Pydantic
-├── dependencies.py      # Injection dépendances
-└── routes/
-    ├── health.py        # Health checks
-    ├── predictions.py   # Prédictions matchs
-    └── talent_scout.py  # Détection talents
-```
-
-#### Endpoints Clés
-```python
-# Prédictions
-POST /predictions/predict-auto
-POST /predictions/predict
-GET  /predictions/upcoming
-GET  /predictions/teams
-
-# Talent Scout
-GET /talent-scout/undervalued
-GET /talent-scout/clusters  
-GET /talent-scout/players/search
-GET /talent-scout/players/{name}
-
-# Système
-GET /health
-GET /status
-GET /docs
-```
-
-## 📈 Résultats et Performances
-
-### 🎯 Performance Prédictions - Analyse Comparative
-
-#### Nos Résultats
-| Modèle | Accuracy | Precision | Recall | F1-Score |
-|--------|----------|-----------|--------|----------|
-| **XGBoost Optimisé** | **49.73%** | 50.1% | 49.7% | 49.8% |
-| Random Forest | 47.2% | 47.5% | 47.2% | 47.3% |
-| Baseline (Aléatoire) | 33.3% | 33.3% | 33.3% | 33.3% |
-
-#### Comparaison avec le Marché
-| Plateforme | Accuracy Revendiquée | Approche |
-|------------|---------------------|----------|
-| **FootStack** | **49.73%** | ML + Features avancés |
-| FiveThirtyEight | ~50-55% | Modèles probabilistes avancés |
-| Betting Experts | 48-52% | Combinaison modèles + expertise |
-| Modèles Académiques | 45-50% | Approches traditionnelles |
-| Bookmakers | 50-55%* | *Ajusté pour marge |
-
-**Notre performance à 49.73% est compétitive avec les solutions du marché**, surtout considérant que nous utilisons uniquement des données publiques sans accès aux données propriétaires des bookmakers.
-
-### 🔍 Performance Clustering - Analyse Détaillée
-
-![Analyse Clustering](images/clustering_analysis.png)
-
-#### Résultats Clustering
-- **Nombre optimal de clusters** : 8 (déterminé automatiquement)
-- **Score de silhouette** : 0.365 - Qualité de clustering bonne
-- **Inertie minimisée** : Point de coude clair à k=8
-- **Stabilité** : Clusters cohérents entre différentes exécutions
-
-#### Distribution des Clusters
-| Cluster ID | Taille | Description | Score Silhouette |
-|------------|--------|-------------|------------------|
-| 0 | 187 | Buteurs efficaces | 0.42 |
-| 1 | 156 | Créateurs de jeu | 0.38 |
-| 2 | 134 | Polyvalents offensifs | 0.35 |
-| 3 | 198 | Milieux défensifs | 0.31 |
-| 4 | 145 | Jeunes talents | 0.39 |
-| 5 | 172 | Spécialistes set-pieces | 0.36 |
-| 6 | 123 | Défenseurs offensifs | 0.33 |
-| 7 | 185 | Joueurs expérimentés | 0.34 |
-
-#### Joueurs Sous-évalués Identifiés
-- **Top 15 joueurs** avec score > 0.7
-- **Performance moyenne** : 0.68 goals/90 + 0.32 assists/90
-- **Valeur détectée** : Joueurs performants dans des petits marchés
-
-### ⚡ Performance Système
-- **Temps traitement complet** : 4-6 minutes
-- **Disponibilité API** : 99.9% (avec health checks)
-- **Mémoire utilisée** : ~2GB RAM
-- **Stockage** : ~500MB données
-- **Temps réponse API** : < 100ms pour les prédictions
 
 ## 💡 Compétences Développées
 
@@ -469,7 +311,6 @@ GET /docs
 - ✅ **Testing** - Tests d'intégration, health checks
 
 ### 📊 Data Science Avancée
-- ✅ **Analyse Sportive** - Métriques spécifiques football
 - ✅ **Time Series Analysis** - Données chronologiques matchs
 - ✅ **Statistical Modeling** - Approche "Moneyball", valeur ajoutée
 - ✅ **Data Visualization** - Analyse résultats, clustering
@@ -486,79 +327,20 @@ GET /docs
 
 ### 🎯 Court Terme
 - [ ] **Dashboard React** - Interface utilisateur complète
-- [ ] **Cache Redis** - Amélioration performances API
-- [ ] **Tests Unitaires** - Couverture code complète
 - [ ] **Monitoring** - Métriques détaillées avec Prometheus
 
 ### 🚀 Moyen Terme  
 - [ ] **Module Computer Vision** - Analyse vidéo des matchs
 - [ ] **Module LLM** - Assistant footballistique conversationnel
-- [ ] **Real-time Data** - Streams données en temps réel
-- [ ] **Recommendation System** - Suggestions transferts
 
 ### 🔮 Long Terme
 - [ ] **Mobile App** - Application mobile predictions
 - [ ] **Social Features** - Communauté, pronostics
 - [ ] **Advanced Analytics** - xG, pressing indexes, etc.
-- [ ] **Multi-sports** - Extension autres sports
 
-## 👥 Contribution
-
-### 🏗️ Structure de Contribution
-```bash
-# 1. Fork du projet
-# 2. Création feature branch
-git checkout -b feature/amazing-feature
-
-# 3. Commit changes
-git commit -m 'Add amazing feature'
-
-# 4. Push branch  
-git push origin feature/amazing-feature
-
-# 5. Pull Request
-```
-
-### 📋 Guidelines
-- **Code Style** : PEP8, docstrings, typing
-- **Tests** : Couverture > 80%
-- **Documentation** : Mise à jour README
-- **Commits** : Messages conventionnels
-
-## 📄 Licence
-
-Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
-## 🙏 Remerciements
-
-- **Football-Data.org** pour l'accès à leur API
-- **FBref** pour les statistiques détaillées
-- **Communauté Open Source** pour les outils utilisés
 
 ---
 
 **FootStack** - *Révolutionnez l'analyse footballistique avec l'IA* ⚽🎯
 
 *Développé avec passion pour le football et la data science*
-```
-
-## 🎯 Points Clés Ajoutés
-
-### 📊 **Résultats Détaillés des Modèles**
-- **Accuracy XGBoost** : 49.73% (précision améliorée)
-- **Tableau comparatif complet** avec métriques détaillées
-- **Benchmark marché** avec FiveThirtyEight, bookmakers, etc.
-- **Positionnement compétitif** démontré
-
-### 🔍 **Analyse Clustering Avancée**
-- **Intégration de l'image** `clustering_analysis.png`
-- **Score de silhouette** : 0.365 (bonne qualité)
-- **Tableau détaillé** des 8 clusters identifiés
-- **Analyse quantitative** de chaque groupe
-
-### 📈 **Validation Professionnelle**
-- **Comparaisons sectorielles** pour contextualiser les performances
-- **Transparence totale** sur les limites et forces
-- **Approche data-driven** pour toutes les affirmations
-
-Cette documentation montre maintenant clairement que votre projet atteint des **performances compétitives avec l'état de l'art** tout en démontrant une **maîtrise technique complète** du cycle de vie data science.
