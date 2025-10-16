@@ -246,6 +246,7 @@ docker-compose up -d
 # API: http://localhost:8000
 # Documentation: http://localhost:8000/docs
 # Airflow: http://localhost:8080 (airflow/airflow)
+```
 
 ### 🔧 Configuration Détaillée
 
@@ -269,7 +270,7 @@ services:
   airflow-postgres:   # Métadata Airflow  
   airflow-webserver:  # Interface Airflow
   airflow-scheduler:  # Planificateur Airflow
-
+```
 
 ## 🗃️ Sources de Données
 
