@@ -35,10 +35,6 @@ graph TB
         O[DAG Management]
     end
     
-    subgraph "Frontend"
-        P[React Dashboard]
-        Q[Real-time Visualizations]
-    end
     
     A --> C
     B --> D
@@ -56,7 +52,6 @@ graph TB
     F --> M
     L --> K
     M --> K
-    K --> P
     N --> C
     N --> D
     N --> I
