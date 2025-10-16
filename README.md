@@ -1,6 +1,67 @@
 # 🚀 FootStack - Plateforme Complète d'Intelligence Footballistique
 
-![FootStack Architecture](images/architecture-overview.png)
+```mermaid
+graph TB
+    subgraph "Data Sources"
+        A[Football-Data.org API]
+        B[FBref Web Scraping]
+    end
+    
+    subgraph "Data Ingestion"
+        C[API Client]
+        D[Selenium Scraper]
+        E[Data Validation]
+    end
+    
+    subgraph "Storage"
+        F[PostgreSQL]
+        G[Models Storage]
+    end
+    
+    subgraph "ML Pipeline"
+        H[Feature Engineering]
+        I[Model Training]
+        J[Clustering]
+    end
+    
+    subgraph "API Layer"
+        K[FastAPI Server]
+        L[Prediction Routes]
+        M[Talent Scout Routes]
+    end
+    
+    subgraph "Orchestration"
+        N[Airflow Scheduler]
+        O[DAG Management]
+    end
+    
+    subgraph "Frontend"
+        P[React Dashboard]
+        Q[Real-time Visualizations]
+    end
+    
+    A --> C
+    B --> D
+    C --> E
+    D --> E
+    E --> F
+    F --> H
+    H --> I
+    H --> J
+    I --> G
+    J --> G
+    G --> L
+    G --> M
+    F --> L
+    F --> M
+    L --> K
+    M --> K
+    K --> P
+    N --> C
+    N --> D
+    N --> I
+    N --> J
+```
 
 ## 📖 Table des Matières
 - [🎯 Aperçu du Projet](#-aperçu-du-projet)
