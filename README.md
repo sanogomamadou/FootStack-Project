@@ -88,7 +88,7 @@ graph TB
     A[Sources de Données] --> B[Data Ingestion]
     B --> C[PostgreSQL]
     C --> D[Feature Engineering]
-    D --> E[ML Pipeline]
+    D --> E[Match Prediction ML Pipeline]
     E --> F[FastAPI]
     C --> G[Clustering]
     G --> H[Talent Scout]
@@ -102,7 +102,7 @@ graph TB
 ```
 FootStack/
 ├── 🗃️ data_ingest/          # Collecte et stockage des données
-├── 🤖 ml_pipeline/          # Pipeline de ML pour prédictions
+├── 🤖 ml_pipeline/          # Pipeline de ML pour prédictions des resultats des matchs
 ├── 🔍 talent_scout/         # Détection de talents
 ├── 🚀 api/                  # API FastAPI
 ├── ⚙️ airflow/              # Orchestration des workflows
@@ -159,7 +159,7 @@ FootStack/
 - **Performance offensive/défensive** (moyennes glissantes)
 
 #### 🤖 Modèles de Machine Learning
-- **XGBoost Optimisé** - Accuracy: 49.73%
+- **XGBoost Optimisé** - Meilleur accuracy
 - **Random Forest** - Performance de comparaison
 - **Validation temporelle** - Split chronologique des données
 - **Feature Importance** - Interprétabilité des prédictions
@@ -199,7 +199,7 @@ GET /talent-scout/players/Messi
 ![Airflow DAG](images/DAG_Airflow.jpeg)
 
 #### 🔄 Pipeline Automatisé
-- **Collecte données** - Tous les 14 jours
+- **Collecte données** - Tous les 14 jours pour capturer la forme réelle actuelle des équipes
 - **Nettoyage** - Transformation et feature engineering
 - **Entraînement** - Re-entraînement des modèles
 
@@ -274,63 +274,11 @@ services:
   airflow-scheduler:  # Planificateur Airflow
 
 
-## 🔧 Modules Détaillés
+## 🗃️ Sources de Données
 
-### 🗃️ Data Ingestion & Storage
-
-#### Sources de Données
 - **Football-Data.org** : Matchs en temps réel, classements
 - **FBref** : Statistiques détaillées des joueurs (scraping)
 - **Périmètre** : Top 5 leagues européennes (2020-2024)
-
-#### Pipeline de Collecte
-```python
-# Workflow complet
-1. Authentification API Football-Data
-2. Collecte compétitions (Premier League, La Liga, etc.)
-3. Récupération matchs historiques (2 ans)
-4. Scraping FBref pour statistiques joueurs
-5. Nettoyage et standardisation
-6. Stockage PostgreSQL
-```
-
-### 🤖 Machine Learning Pipeline
-
-#### Feature Engineering
-```python
-features = {
-    # Forme récente (5 derniers matchs)
-    'home_points_avg_5', 'home_goals_for_avg_5', 'home_goals_against_avg_5',
-    
-    # Confrontations directes  
-    'h2h_win_rate_home', 'h2h_win_rate_away', 'h2h_matches_played',
-    
-    # Contexte match
-    'home_days_rest', 'away_days_rest', 'rest_advantage', 'matchday_importance'
-}
-```
-
-#### Modèles Implémentés
-- **XGBoost Optimisé** : Meilleure performance
-- **Random Forest** : Baseline robuste
-- **Optimisation** : GridSearchCV pour hyperparamètres
-
-#### Évaluation
-- **Split temporel** : 80/20 chronologique
-- **Métriques** : Accuracy, Precision, Recall, F1-Score
-- **Feature Importance** : Analyse de l'impact des variables
-
-### 🔍 Talent Scout & Clustering
-
-#### Algorithme de Clustering
-```python
-# Pipeline de clustering
-1. Préparation features (goals_per90, assists_per90, etc.)
-2. Standardisation des données
-3. Détermination k optimal (méthode coude)
-4. Application K-means
-5. Analyse des clusters
-6. Identification joueurs sous-évalués
 
 
 ## 💡 Compétences Développées
