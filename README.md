@@ -64,8 +64,6 @@ graph TB
 - [🛠️ Stack Technologique](#️-stack-technologique)
 - [📊 Fonctionnalités](#-fonctionnalités)
 - [🚀 Installation et Démarrage](#-installation-et-démarrage)
-- [🔧 Modules Détaillés](#-modules-détaillés)
-- [📈 Résultats et Performances](#-résultats-et-performances)
 - [💡 Compétences Développées](#-compétences-développées)
 - [🔮 Améliorations Futures](#-améliorations-futures)
 
@@ -179,7 +177,7 @@ FootStack/
 - **Profils types** : Buteurs prolifiques, Créateurs de jeu, Polyvalents
 
 #### 🌐 API Talent Scout Complète
-![Prédictions API](images/Interface_API_talent.jpeg)
+![Prédictions API](images/Interface_API_talent.png)
 
 ```bash
 # Joueurs sous-évalués
@@ -248,7 +246,6 @@ docker-compose up -d
 # API: http://localhost:8000
 # Documentation: http://localhost:8000/docs
 # Airflow: http://localhost:8080 (airflow/airflow)
-```
 
 ### 🔧 Configuration Détaillée
 

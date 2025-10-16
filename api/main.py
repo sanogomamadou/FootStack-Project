@@ -19,7 +19,7 @@ from .routes import predictions, health
 # Création de l'application FastAPI
 app = FastAPI(
     title="FootStack API",
-    description="API de prédiction de résultats de matchs de football basée sur l'IA",
+    description="API de prédiction de résultats de matchs de football et Detection de talents basée sur l'IA",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
