@@ -24,12 +24,6 @@
 - ✅ **Exposer les fonctionnalités** via une API REST professionnelle
 - ✅ **Conteneuriser l'application** pour un déploiement facile
 
-### 📊 Métriques Clés
-- **Accuracy des prédictions** : 49.7%
-- **Joueurs analysés** : 1,500+ 
-- **Matchs historiques** : 10,000+
-- **Temps de traitement** : < 5 minutes pour le re-entraînement
-
 
 ## 🏗️ Architecture du Système
 
@@ -42,7 +36,6 @@ graph TB
     E --> F[FastAPI]
     C --> G[Clustering]
     G --> H[Talent Scout]
-    F --> I[Frontend Dashboard]
     H --> I
     J[Airflow] --> B
     J --> E
