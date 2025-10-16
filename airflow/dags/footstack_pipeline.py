@@ -30,12 +30,12 @@ with DAG(
     wait_for_db = BashOperator(
         task_id='wait_for_database',
         bash_command="""
-echo "⏳ Attente de la base de données..."
+echo "  Attente de la base de données..."
 until PGPASSWORD=postgres psql -h postgres -U postgres -d footstack -c "SELECT 1;" > /dev/null 2>&1; do
     sleep 5
     echo "En attente de PostgreSQL..."
 done
-echo "✅ Base de données prête!"
+echo "  Base de données prête!"
 """,
     )
     
@@ -51,17 +51,17 @@ os.environ[\"DATABASE_URL\"] = \"postgresql://postgres:postgres@postgres:5432/fo
 from data_ingest.ingest import init_db, ingest_matches_for_competition
 from data_ingest.db import SessionLocal
 
-print(\"🚀 Début ingestion données...\")
+print(\"  Début ingestion données...\")
 init_db()
 session = SessionLocal()
 
 competitions = [2001, 2021, 2014, 2019, 2002, 2015]
 for comp_id in competitions:
-    print(f\"📥 Compétition {comp_id}...\")
+    print(f\"  Compétition {comp_id}...\")
     ingest_matches_for_competition(session, comp_id, days_back=730)
 
 session.close()
-print(\"✅ Ingestion terminée\")
+print(\"  Ingestion terminée\")
 '
 """,
     )
@@ -70,7 +70,7 @@ print(\"✅ Ingestion terminée\")
     clean_data = BashOperator(
         task_id='clean_data',
         bash_command="""
-echo "🧹 Nettoyage des données..."
+echo "  Nettoyage des données..."
 PGPASSWORD=postgres psql -h postgres -U postgres -d footstack << 'EOSQL'
 DROP TABLE IF EXISTS matches_cleaned;
 
@@ -101,7 +101,7 @@ AND m.score IS NOT NULL
 AND (m.raw -> 'homeTeam' ->> 'name') IS NOT NULL
 AND (m.raw -> 'awayTeam' ->> 'name') IS NOT NULL;
 
-SELECT '✅ matches_cleaned: ' || COUNT(*) || ' matchs' FROM matches_cleaned;
+SELECT '  matches_cleaned: ' || COUNT(*) || ' matchs' FROM matches_cleaned;
 EOSQL
 """,
     )
@@ -115,11 +115,11 @@ python -c '
 import os
 os.environ[\"DATABASE_URL\"] = \"postgresql://postgres:postgres@postgres:5432/footstack\"
 from ml_pipeline.feature_engineering import FootballFeatureEngineer
-print(\"🔧 Calcul des features...\")
+print(\"  Calcul des features...\")
 engineer = FootballFeatureEngineer(\"postgresql://postgres:postgres@postgres:5432/footstack\")
 features_df = engineer.build_features()
 features_df.to_csv(\"/opt/footstack/data/features_dataset.csv\", index=False)
-print(f\"✅ Features: {features_df.shape}\")
+print(f\"  Features: {features_df.shape}\")
 '
 """,
     )
@@ -131,11 +131,11 @@ print(f\"✅ Features: {features_df.shape}\")
 cd /opt/footstack && \
 python -c '
 from ml_pipeline.model_training import FootballModelTrainer
-print(\"🤖 Entraînement des modèles...\")
+print(\"  Entraînement des modèles...\")
 trainer = FootballModelTrainer(\"/opt/footstack/data/features_dataset.csv\")
 models, results = trainer.train_all_models()
 trainer.save_models(\"/opt/footstack/models\")
-print(\"✅ Modèles entraînés\")
+print(\"  Modèles entraînés\")
 '
 """,
     )
@@ -147,16 +147,16 @@ print(\"✅ Modèles entraînés\")
 cd /opt/footstack && \
 python -c '
 from ml_pipeline.model_improvement import ModelImprover
-print(\"🎯 Optimisation des modèles...\")
+print(\"  Optimisation des modèles...\")
 improver = ModelImprover(\"/opt/footstack/data/features_dataset.csv\")
 best_model, accuracy = improver.optimize_xgboost()
-print(f\"✅ Modèle optimisé: Accuracy {accuracy:.4f}\")
+print(f\"  Modèle optimisé: Accuracy {accuracy:.4f}\")
 
 # Sauvegarde des modèles optimisés
 import joblib
 joblib.dump(best_model, \"/opt/footstack/models/xgboost_optimized.joblib\")
 joblib.dump(improver.label_encoder, \"/opt/footstack/models/label_encoder_optimized.joblib\")
-print(\"💾 Modèles optimisés sauvegardés\")
+print(\"  Modèles optimisés sauvegardés\")
 '
 """,
     )

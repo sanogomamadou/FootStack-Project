@@ -17,13 +17,13 @@ class TalentScoutService:
         """Charger les données clusterisées"""
         try:
             self.df_clustered = pd.read_csv("data/players_with_clusters.csv")
-            logger.info(f"✅ Données chargées: {len(self.df_clustered)} joueurs")
+            logger.info(f"  Données chargées: {len(self.df_clustered)} joueurs")
             
             # Convertir les types NumPy en types Python natifs
             self._convert_numpy_types()
             
         except Exception as e:
-            logger.error(f"❌ Erreur chargement données: {e}")
+            logger.error(f"  Erreur chargement données: {e}")
             self.df_clustered = None
     
     def _convert_numpy_types(self):
@@ -69,11 +69,11 @@ class TalentScoutService:
                 }
                 players.append(player_data)
             
-            logger.info(f"🎯 {len(players)} joueurs sous-évalués trouvés (score >= {min_score})")
+            logger.info(f"  {len(players)} joueurs sous-évalués trouvés (score >= {min_score})")
             return players
             
         except Exception as e:
-            logger.error(f"❌ Erreur récupération joueurs sous-évalués: {e}")
+            logger.error(f"  Erreur récupération joueurs sous-évalués: {e}")
             return []
     
     def get_cluster_analysis(self) -> List[Dict[str, Any]]:
@@ -128,11 +128,11 @@ class TalentScoutService:
                 }
                 clusters_analysis.append(analysis)
             
-            logger.info(f"📊 Analyse de {len(clusters_analysis)} clusters générée")
+            logger.info(f"  Analyse de {len(clusters_analysis)} clusters générée")
             return clusters_analysis
             
         except Exception as e:
-            logger.error(f"❌ Erreur analyse clusters: {e}")
+            logger.error(f"  Erreur analyse clusters: {e}")
             return []
     
     def search_players(self, name: Optional[str] = None, team: Optional[str] = None, 
@@ -177,11 +177,11 @@ class TalentScoutService:
                 }
                 players.append(player_data)
             
-            logger.info(f"🔍 {len(players)} joueurs trouvés pour la recherche")
+            logger.info(f"  {len(players)} joueurs trouvés pour la recherche")
             return players
             
         except Exception as e:
-            logger.error(f"❌ Erreur recherche joueurs: {e}")
+            logger.error(f"  Erreur recherche joueurs: {e}")
             return []
     
     def get_player_details(self, player_name: str) -> Optional[Dict[str, Any]]:
@@ -237,7 +237,7 @@ class TalentScoutService:
             return response
             
         except Exception as e:
-            logger.error(f"❌ Erreur détails joueur: {e}")
+            logger.error(f"  Erreur détails joueur: {e}")
             return None
     
     def _calculate_undervalued_score(self, df: pd.DataFrame) -> pd.DataFrame:

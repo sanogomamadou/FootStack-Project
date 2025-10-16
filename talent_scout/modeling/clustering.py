@@ -23,9 +23,9 @@ logger = logging.getLogger(__name__)
 try:
     from data_ingest.db import SessionLocal
     from data_ingest.models import PlayerCluster
-    print("✅ Modules data_ingest importés avec succès")
+    print("  Modules data_ingest importés avec succès")
 except ImportError as e:
-    print(f"❌ Erreur import data_ingest: {e}")
+    print(f"  Erreur import data_ingest: {e}")
     sys.exit(1)
 
 class PlayerClustering:
@@ -144,7 +144,7 @@ class PlayerClustering:
             plt.savefig('data/clustering_analysis.png', dpi=300, bbox_inches='tight')
             plt.close()
             
-            logger.info("📊 Graphique d'analyse sauvegardé: data/clustering_analysis.png")
+            logger.info("  Graphique d'analyse sauvegardé: data/clustering_analysis.png")
             
         except Exception as e:
             logger.warning(f"Impossible de sauvegarder le graphique: {e}")
@@ -175,8 +175,8 @@ class PlayerClustering:
         # Analyser les clusters
         cluster_analysis = self._analyze_clusters(df_with_clusters)
         
-        logger.info(f"✅ Clustering terminé. {self.n_clusters} clusters créés.")
-        logger.info(f"📈 Distribution: {df_with_clusters['cluster'].value_counts().to_dict()}")
+        logger.info(f"  Clustering terminé. {self.n_clusters} clusters créés.")
+        logger.info(f"  Distribution: {df_with_clusters['cluster'].value_counts().to_dict()}")
         
         return df_with_clusters, cluster_analysis
     
@@ -244,7 +244,7 @@ class PlayerClustering:
              'performance_score_norm', 'cluster', 'distance_to_centroid', 'undervalued_score']
         ]
         
-        logger.info(f"🎯 {len(top_undervalued)} joueurs sous-évalués identifiés")
+        logger.info(f"  {len(top_undervalued)} joueurs sous-évalués identifiés")
         
         return top_undervalued
     
@@ -262,7 +262,7 @@ class PlayerClustering:
         }
         
         joblib.dump(model_data, filepath)
-        logger.info(f"💾 Modèle sauvegardé: {filepath}")
+        logger.info(f"  Modèle sauvegardé: {filepath}")
     
     @classmethod
     def load_model(cls, filepath: str = "models/player_clustering.joblib"):
@@ -274,14 +274,14 @@ class PlayerClustering:
         instance.scaler = model_data['scaler']
         instance.feature_columns = model_data['feature_columns']
         
-        logger.info(f"📂 Modèle chargé: {filepath}")
+        logger.info(f" Modèle chargé: {filepath}")
         return instance
 
     def save_clusters_to_database(self, df_clustered: pd.DataFrame):
         """
         Sauvegarder les résultats du clustering dans la table player_clusters
         """
-        logger.info("💾 Sauvegarde des clusters en base de données...")
+        logger.info("  Sauvegarde des clusters en base de données...")
         
         session = SessionLocal()
         try:
@@ -306,11 +306,11 @@ class PlayerClustering:
             session.bulk_save_objects(clusters_to_insert)
             session.commit()
             
-            logger.info(f"✅ {len(clusters_to_insert)} clusters sauvegardés en base de données")
+            logger.info(f"  {len(clusters_to_insert)} clusters sauvegardés en base de données")
             
         except Exception as e:
             session.rollback()
-            logger.error(f"❌ Erreur sauvegarde clusters en base: {e}")
+            logger.error(f"  Erreur sauvegarde clusters en base: {e}")
             raise
         finally:
             session.close()
@@ -319,27 +319,27 @@ def run_complete_clustering_pipeline():
     """
     Exécuter le pipeline complet de clustering
     """
-    logger.info("🚀 Démarrage du pipeline complet de clustering...")
+    logger.info("  Démarrage du pipeline complet de clustering...")
     
     try:
         # MODIFICATION : Charger directement depuis le CSV existant
-        logger.info("📂 Chargement des données depuis data/processed_players.csv...")
+        logger.info(" Chargement des données depuis data/processed_players.csv...")
         df = pd.read_csv("data/processed_players.csv")
-        logger.info(f"✅ Données chargées: {len(df)} joueurs")
+        logger.info(f"  Données chargées: {len(df)} joueurs")
         
     except FileNotFoundError:
         # Fallback : utiliser le data_processor si le CSV n'existe pas
-        logger.info("📂 Fichier CSV non trouvé, utilisation du data_processor...")
+        logger.info(" Fichier CSV non trouvé, utilisation du data_processor...")
         try:
             from talent_scout.data_collection.data_processor import process_player_data
             df = process_player_data(save_csv=True)
         except ImportError as e:
-            logger.error(f"❌ Impossible d'importer data_processor: {e}")
-            logger.error("💡 Assure-toi que le fichier data/processed_players.csv existe")
+            logger.error(f"  Impossible d'importer data_processor: {e}")
+            logger.error(" Assure-toi que le fichier data/processed_players.csv existe")
             return None, None, None
     
     if df.empty:
-        logger.error("❌ Aucune donnée à clusteriser")
+        logger.error("  Aucune donnée à clusteriser")
         return None, None, None
     
     # 2. Initialiser et configurer le clustering
@@ -364,16 +364,16 @@ def run_complete_clustering_pipeline():
     
     # 8. Afficher les résultats
     print("\n" + "="*70)
-    print("🎯 RAPPORT DE CLUSTERING - JOUEURS SOUS-ÉVALUÉS")
+    print("  RAPPORT DE CLUSTERING - JOUEURS SOUS-ÉVALUÉS")
     print("="*70)
     
-    print(f"\n🏆 TOP 15 JOUEURS SOUS-ÉVALUÉS:")
+    print(f"\n  TOP 15 JOUEURS SOUS-ÉVALUÉS:")
     for idx, (_, player) in enumerate(undervalued_players.iterrows(), 1):
         print(f"{idx:2d}. {player['name']:25} | {player['team']:20} | "
               f"{player['position_group']:10} | Buts/90: {player['goals_per90']:4.2f} | "
               f"Passes/90: {player['assists_per90']:4.2f} | Score: {player['undervalued_score']:.3f}")
     
-    print(f"\n📊 ANALYSE DES {optimal_k} CLUSTERS:")
+    print(f"\n  ANALYSE DES {optimal_k} CLUSTERS:")
     for cluster_id, profile in cluster_analysis.items():
         main_positions = list(profile['main_positions'].keys())[:2] if profile['main_positions'] else []
         positions_str = ", ".join(main_positions)
@@ -382,7 +382,7 @@ def run_complete_clustering_pipeline():
               f"Passes/90: {profile['avg_assists_per90']:5.2f} | "
               f"Positions: {positions_str}")
     
-    print(f"\n📈 STATISTIQUES GLOBALES:")
+    print(f"\n  STATISTIQUES GLOBALES:")
     print(f"   • Total joueurs clusterisés: {len(df_clustered)}")
     print(f"   • Joueurs sous-évalués identifiés: {len(undervalued_players)}")
     print(f"   • Score moyen des sous-évalués: {undervalued_players['undervalued_score'].mean():.3f}")
@@ -394,9 +394,9 @@ def run_complete_clustering_pipeline():
         session.close()
         print(f"   • Clusters en base de données: {cluster_count}")
     except Exception as e:
-        print(f"   • ❌ Erreur vérification base: {e}")
+        print(f"   •   Erreur vérification base: {e}")
     
-    print(f"\n💡 INTERPRÉTATION:")
+    print(f"\n INTERPRÉTATION:")
     print("   • Score > 0.8: Très sous-évalué - forte recommandation")
     print("   • Score 0.6-0.8: Sous-évalué - bonne opportunité") 
     print("   • Score < 0.6: Potentiel à surveiller")
@@ -405,14 +405,14 @@ def run_complete_clustering_pipeline():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    print("🔧 Initialisation du clustering des joueurs...")
+    print("  Initialisation du clustering des joueurs...")
     df_clustered, undervalued_players, cluster_analysis = run_complete_clustering_pipeline()
     
     if df_clustered is not None:
-        print("\n✅ Clustering terminé avec succès!")
-        print("💾 Fichiers créés:")
+        print("\n  Clustering terminé avec succès!")
+        print("  Fichiers créés:")
         print("   - data/players_with_clusters.csv")
         print("   - data/clustering_analysis.png") 
         print("   - models/player_clustering.joblib")
     else:
-        print("\n❌ Le clustering a échoué")
+        print("\n  Le clustering a échoué")

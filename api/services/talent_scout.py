@@ -21,9 +21,9 @@ class TalentScoutService:
         try:
             model_path = "models/player_clustering.joblib"
             self.clustering_model = joblib.load(model_path)
-            logger.info("✅ Modèle de clustering chargé")
+            logger.info("  Modèle de clustering chargé")
         except Exception as e:
-            logger.error(f"❌ Erreur chargement modèle clustering: {e}")
+            logger.error(f"  Erreur chargement modèle clustering: {e}")
             self.clustering_model = None
     
     def get_undervalued_players(self, top_n: int = 15) -> Dict:
@@ -31,7 +31,7 @@ class TalentScoutService:
         Récupérer les joueurs sous-évalués depuis la base de données
         """
         try:
-            logger.info(f"🔍 Recherche des {top_n} joueurs sous-évalués...")
+            logger.info(f"  Recherche des {top_n} joueurs sous-évalués...")
             
             # Requête pour récupérer les joueurs sous-évalués avec leurs clusters
             query = text("""
@@ -82,7 +82,7 @@ class TalentScoutService:
                     'main_positions': position_counts
                 }
             
-            logger.info(f"✅ {len(players_df)} joueurs sous-évalués trouvés")
+            logger.info(f"  {len(players_df)} joueurs sous-évalués trouvés")
             
             return {
                 'undervalued_players': players_df.to_dict('records'),
@@ -92,7 +92,7 @@ class TalentScoutService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Erreur recherche joueurs sous-évalués: {e}")
+            logger.error(f"  Erreur recherche joueurs sous-évalués: {e}")
             return {
                 'undervalued_players': [],
                 'cluster_analysis': {},
@@ -105,7 +105,7 @@ class TalentScoutService:
         Rechercher des joueurs par profil spécifique
         """
         try:
-            logger.info("🔍 Recherche de joueurs par profil...")
+            logger.info("  Recherche de joueurs par profil...")
             
             query_params = {}
             where_conditions = []
@@ -157,12 +157,12 @@ class TalentScoutService:
             
             players_df = pd.read_sql_query(text(base_query), self.db.bind, params=query_params)
             
-            logger.info(f"✅ {len(players_df)} joueurs trouvés avec le profil spécifié")
+            logger.info(f"  {len(players_df)} joueurs trouvés avec le profil spécifié")
             
             return players_df.to_dict('records')
             
         except Exception as e:
-            logger.error(f"❌ Erreur recherche par profil: {e}")
+            logger.error(f"  Erreur recherche par profil: {e}")
             return []
     
     def find_similar_players(self, player_name: str, max_results: int = 10) -> List[Dict]:
@@ -170,7 +170,7 @@ class TalentScoutService:
         Trouver des joueurs similaires à un joueur donné
         """
         try:
-            logger.info(f"🔍 Recherche de joueurs similaires à {player_name}...")
+            logger.info(f"  Recherche de joueurs similaires à {player_name}...")
             
             # Trouver le cluster du joueur cible
             cluster_query = text("""
@@ -188,7 +188,7 @@ class TalentScoutService:
             )
             
             if target_cluster.empty:
-                logger.warning(f"❌ Joueur {player_name} non trouvé")
+                logger.warning(f"  Joueur {player_name} non trouvé")
                 return []
             
             cluster_id = target_cluster['cluster_id'].iloc[0]
@@ -224,12 +224,12 @@ class TalentScoutService:
                 }
             )
             
-            logger.info(f"✅ {len(similar_players)} joueurs similaires trouvés")
+            logger.info(f"  {len(similar_players)} joueurs similaires trouvés")
             
             return similar_players.to_dict('records')
             
         except Exception as e:
-            logger.error(f"❌ Erreur recherche joueurs similaires: {e}")
+            logger.error(f"  Erreur recherche joueurs similaires: {e}")
             return []
     
     def get_cluster_analysis(self) -> Dict:
@@ -237,7 +237,7 @@ class TalentScoutService:
         Obtenir une analyse détaillée de tous les clusters
         """
         try:
-            logger.info("📊 Génération de l'analyse des clusters...")
+            logger.info("  Génération de l'analyse des clusters...")
             
             query = text("""
             SELECT 
@@ -279,10 +279,10 @@ class TalentScoutService:
                     'top_teams': team_counts
                 }
             
-            logger.info(f"✅ Analyse de {len(cluster_analysis)} clusters générée")
+            logger.info(f"  Analyse de {len(cluster_analysis)} clusters générée")
             
             return cluster_analysis
             
         except Exception as e:
-            logger.error(f"❌ Erreur analyse clusters: {e}")
+            logger.error(f"  Erreur analyse clusters: {e}")
             return {}

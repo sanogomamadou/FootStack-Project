@@ -1,3 +1,4 @@
+# api/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text  # AJOUT IMPORTANT
@@ -50,8 +51,8 @@ app.include_router(talent_scout.router)
 @app.on_event("startup")
 async def startup_event():
     """Événement au démarrage de l'application"""
-    logger.info("🚀 Démarrage de FootStack API...")
-    logger.info("📊 Chargement des modèles ML...")
+    logger.info("  Démarrage de FootStack API...")
+    logger.info("  Chargement des modèles ML...")
     
     # Test du chargement des modèles au démarrage
     try:
@@ -63,25 +64,25 @@ async def startup_event():
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))  # AJOUT text()
         
-        logger.info("✅ Modèles ML et base de données chargés avec succès")
-        logger.info(f"🎯 Modèle: {type(model).__name__}")
-        logger.info(f"📈 Classes: {list(encoder.classes_)}")
+        logger.info("  Modèles ML et base de données chargés avec succès")
+        logger.info(f"  Modèle: {type(model).__name__}")
+        logger.info(f"  Classes: {list(encoder.classes_)}")
         
     except Exception as e:
-        logger.error(f"❌ Erreur au démarrage: {e}")
+        logger.error(f"  Erreur au démarrage: {e}")
         # Ne pas lever l'exception pour permettre le démarrage même si DB échoue
-        logger.warning("⚠️  Démarrage en mode dégradé (sans base de données)")
+        logger.warning("   Démarrage en mode dégradé (sans base de données)")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Événement à l'arrêt de l'application"""
-    logger.info("🛑 Arrêt de FootStack API...")
+    logger.info("  Arrêt de FootStack API...")
 
 @app.get("/")
 async def root():
     """Page d'accueil de l'API"""
     return {
-        "message": "Bienvenue sur FootStack API 🚀",
+        "message": "Bienvenue sur FootStack API  ",
         "version": "1.0.0",
         "description": "API de prédiction de résultats de matchs de football basée sur l'IA",
         "model_accuracy": "49.7%",
@@ -157,7 +158,7 @@ async def status():
 
 # Pour lancer en développement
 if __name__ == "__main__":
-    logger.info("🏁 Lancement de FootStack API en mode développement...")
+    logger.info("  Lancement de FootStack API en mode développement...")
     uvicorn.run(
         "api.main:app",
         host="0.0.0.0", 

@@ -15,7 +15,7 @@ class FeatureCalculator:
     def get_team_recent_form(self, team_name: str, date: datetime, lookback_matches: int = 5) -> Dict:
         """Calculer la forme récente d'une équipe"""
         try:
-            logger.info(f"🔍 Recherche derniers matchs pour {team_name} avant {date}")
+            logger.info(f"  Recherche derniers matchs pour {team_name} avant {date}")
             
             # Récupérer les derniers matchs de l'équipe
             query = text("""
@@ -52,15 +52,15 @@ class FeatureCalculator:
                 }
             )
             
-            logger.info(f"📊 {len(team_matches)} matchs trouvés pour {team_name}")
+            logger.info(f"  {len(team_matches)} matchs trouvés pour {team_name}")
             
             if len(team_matches) == 0:
-                logger.warning(f"❌ Aucun match trouvé pour {team_name}, utilisation valeurs par défaut")
+                logger.warning(f"  Aucun match trouvé pour {team_name}, utilisation valeurs par défaut")
                 return self._get_default_features()
             
             # Afficher les matchs trouvés pour debug
             for _, match in team_matches.iterrows():
-                logger.info(f"   📅 {match['date']} | {match['home_team']} {match['home_score']}-{match['away_score']} {match['away_team']} | Points: {match['points']}")
+                logger.info(f"     {match['date']} | {match['home_team']} {match['home_score']}-{match['away_score']} {match['away_team']} | Points: {match['points']}")
             
             # Calculer les moyennes
             points_avg = team_matches['points'].mean()
@@ -69,7 +69,7 @@ class FeatureCalculator:
             goal_diff_avg = goals_for_avg - goals_against_avg
             recent_form = team_matches['points'].sum()
             
-            logger.info(f"📈 Stats {team_name}: Points={points_avg:.2f}, Buts pour={goals_for_avg:.2f}, Buts contre={goals_against_avg:.2f}")
+            logger.info(f"  Stats {team_name}: Points={points_avg:.2f}, Buts pour={goals_for_avg:.2f}, Buts contre={goals_against_avg:.2f}")
             
             return {
                 'points_avg': float(points_avg),
@@ -80,13 +80,13 @@ class FeatureCalculator:
             }
             
         except Exception as e:
-            logger.error(f"❌ Erreur calcul forme {team_name}: {e}")
+            logger.error(f"  Erreur calcul forme {team_name}: {e}")
             return self._get_default_features()
     
     def get_head_to_head(self, home_team: str, away_team: str, date: datetime) -> Dict:
         """Calculer les statistiques des confrontations directes"""
         try:
-            logger.info(f"⚔️ Recherche H2H: {home_team} vs {away_team}")
+            logger.info(f"  Recherche H2H: {home_team} vs {away_team}")
             
             query = text("""
             SELECT home_team, away_team, result, date
@@ -108,15 +108,15 @@ class FeatureCalculator:
                 }
             )
             
-            logger.info(f"🤝 {len(h2h_matches)} matchs H2H trouvés")
+            logger.info(f"  {len(h2h_matches)} matchs H2H trouvés")
             
             if len(h2h_matches) == 0:
-                logger.warning("❌ Aucun H2H trouvé, utilisation valeurs par défaut")
+                logger.warning("  Aucun H2H trouvé, utilisation valeurs par défaut")
                 return {'win_rate_home': 0.5, 'win_rate_away': 0.5, 'matches_played': 0}
             
             # Afficher les H2H pour debug
             for _, match in h2h_matches.iterrows():
-                logger.info(f"   📅 {match['date']} | {match['home_team']} vs {match['away_team']} | Résultat: {match['result']}")
+                logger.info(f"     {match['date']} | {match['home_team']} vs {match['away_team']} | Résultat: {match['result']}")
             
             # Compter les résultats
             home_wins = len(h2h_matches[
@@ -132,7 +132,7 @@ class FeatureCalculator:
             draws = len(h2h_matches[h2h_matches['result'] == 'Draw'])
             total_matches = len(h2h_matches)
             
-            logger.info(f"🎯 H2H: Home wins={home_wins}, Away wins={away_wins}, Draws={draws}")
+            logger.info(f"  H2H: Home wins={home_wins}, Away wins={away_wins}, Draws={draws}")
             
             return {
                 'win_rate_home': home_wins / total_matches if total_matches > 0 else 0.5,
@@ -141,26 +141,26 @@ class FeatureCalculator:
             }
             
         except Exception as e:
-            logger.error(f"❌ Erreur calcul H2H {home_team} vs {away_team}: {e}")
+            logger.error(f"  Erreur calcul H2H {home_team} vs {away_team}: {e}")
             return {'win_rate_home': 0.5, 'win_rate_away': 0.5, 'matches_played': 0}
     
     def get_contextual_features(self, home_team: str, away_team: str, match_date: datetime) -> Dict:
         """Calculer les features contextuelles"""
         try:
-            logger.info(f"📅 Calcul features contextuelles pour {home_team} vs {away_team}")
+            logger.info(f"  Calcul features contextuelles pour {home_team} vs {away_team}")
             
             # Jours de repos
             home_rest = self._get_days_rest(home_team, match_date)
             away_rest = self._get_days_rest(away_team, match_date)
             
-            logger.info(f"⏰ Jours repos: {home_team}={home_rest}j, {away_team}={away_rest}j")
+            logger.info(f"  Jours repos: {home_team}={home_rest}j, {away_team}={away_rest}j")
             
             # Importance de la journée (simplifié)
             matchday_importance = 0.5  # À améliorer avec la saison réelle
             
             # Weekend
             is_weekend = 1 if match_date.weekday() >= 5 else 0
-            logger.info(f"📆 Weekend: {is_weekend} (jour {match_date.weekday()})")
+            logger.info(f"  Weekend: {is_weekend} (jour {match_date.weekday()})")
             
             return {
                 'home_days_rest': home_rest,
@@ -171,7 +171,7 @@ class FeatureCalculator:
             }
             
         except Exception as e:
-            logger.error(f"❌ Erreur calcul features contextuelles: {e}")
+            logger.error(f"  Erreur calcul features contextuelles: {e}")
             return {
                 'home_days_rest': 7, 'away_days_rest': 7, 'rest_advantage': 0,
                 'matchday_importance': 0.5, 'is_weekend': 0
@@ -197,18 +197,18 @@ class FeatureCalculator:
             )
             
             if result.empty or result['last_match'].iloc[0] is None:
-                logger.warning(f"⏰ Aucun match précédent trouvé pour {team}, utilisation 7 jours par défaut")
+                logger.warning(f"  Aucun match précédent trouvé pour {team}, utilisation 7 jours par défaut")
                 return 7  # Default
             
             last_match = pd.to_datetime(result['last_match'].iloc[0])
             days_rest = (match_date - last_match).days
             
-            logger.info(f"⏰ {team}: dernier match {last_match.date()}, repos={days_rest}j")
+            logger.info(f"  {team}: dernier match {last_match.date()}, repos={days_rest}j")
             
             return max(1, min(days_rest, 14))  # Entre 1 et 14 jours
             
         except Exception as e:
-            logger.error(f"❌ Erreur calcul jours repos {team}: {e}")
+            logger.error(f"  Erreur calcul jours repos {team}: {e}")
             return 7
     
     def _get_default_features(self) -> Dict:
@@ -223,26 +223,26 @@ class FeatureCalculator:
     
     def calculate_all_features(self, home_team: str, away_team: str, match_date: datetime) -> Dict:
         """Calculer toutes les features pour une prédiction"""
-        logger.info(f"🧮 Début calcul features pour {home_team} vs {away_team} le {match_date}")
+        logger.info(f"  Début calcul features pour {home_team} vs {away_team} le {match_date}")
         
         # Forme récente
-        logger.info(f"📊 Calcul forme récente...")
+        logger.info(f"  Calcul forme récente...")
         home_form = self.get_team_recent_form(home_team, match_date)
         away_form = self.get_team_recent_form(away_team, match_date)
         
         # Confrontations directes
-        logger.info(f"⚔️ Calcul H2H...")
+        logger.info(f"  Calcul H2H...")
         h2h = self.get_head_to_head(home_team, away_team, match_date)
         
         # Features contextuelles
-        logger.info(f"📅 Calcul contexte...")
+        logger.info(f"  Calcul contexte...")
         context = self.get_contextual_features(home_team, away_team, match_date)
         
         # Features différentielles
         form_difference = home_form['points_avg'] - away_form['points_avg']
         goal_difference = home_form['goal_diff_avg'] - away_form['goal_diff_avg']
         
-        # 🔥 ASSEMBLAGE FINAL AVEC LES BONS NOMS DE FEATURES
+        #   ASSEMBLAGE FINAL AVEC LES BONS NOMS DE FEATURES
         features = {
             # Home team features
             'home_points_avg_5': home_form['points_avg'],
@@ -275,9 +275,9 @@ class FeatureCalculator:
             'is_weekend': context['is_weekend']
         }
         
-        logger.info(f"✅ Features calculées pour {home_team} vs {away_team}")
-        logger.info(f"📈 Résumé: Forme Home={home_form['points_avg']:.2f}, Away={away_form['points_avg']:.2f}")
-        logger.info(f"🤝 H2H: {h2h['matches_played']} matchs, Home win rate={h2h['win_rate_home']:.2f}")
+        logger.info(f"  Features calculées pour {home_team} vs {away_team}")
+        logger.info(f"  Résumé: Forme Home={home_form['points_avg']:.2f}, Away={away_form['points_avg']:.2f}")
+        logger.info(f"  H2H: {h2h['matches_played']} matchs, Home win rate={h2h['win_rate_home']:.2f}")
         
         # Vérification que toutes les features attendues sont présentes
         expected_features = [
@@ -292,8 +292,8 @@ class FeatureCalculator:
         
         missing_features = [f for f in expected_features if f not in features]
         if missing_features:
-            logger.error(f"❌ Features manquantes: {missing_features}")
+            logger.error(f"  Features manquantes: {missing_features}")
         else:
-            logger.info("✅ Toutes les features attendues sont présentes")
+            logger.info("  Toutes les features attendues sont présentes")
         
         return features

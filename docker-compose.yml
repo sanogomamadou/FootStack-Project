@@ -64,10 +64,10 @@ services:
       - "8080:8080"
     command: >
       bash -c "
-        echo '⏳ Initialisation Airflow...' &&
+        echo '  Initialisation Airflow...' &&
         airflow db init &&
         airflow users create --username airflow --password airflow --firstname Airflow --lastname User --role Admin --email airflow@example.com &&
-        echo '✅ Airflow initialisé!' &&
+        echo '  Airflow initialisé!' &&
         airflow webserver
       "
     depends_on:

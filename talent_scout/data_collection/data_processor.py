@@ -13,13 +13,13 @@ from data_ingest.db import SessionLocal, Base
 def process_player_data(save_csv=True):
     session = SessionLocal()
     try:
-        # 1️⃣ Charger les données
+        # Charger les données
         players = pd.read_sql(session.query(Player).statement, session.bind)
         stats = pd.read_sql(session.query(PlayerStats).statement, session.bind)
 
-        print(f"✅ {len(players)} joueurs | {len(stats)} stats chargées")
+        print(f"  {len(players)} joueurs | {len(stats)} stats chargées")
 
-        # 2️⃣ Fusionner les tables
+        #  Fusionner les tables
         merged = pd.merge(
             stats,
             players,
@@ -28,7 +28,7 @@ def process_player_data(save_csv=True):
             suffixes=('_stats', '_info')
         )
 
-        # 3️⃣ Feature Engineering
+        # Feature Engineering
         merged["goal_contrib_per90"] = (merged["goals"] + merged["assists"]) / (merged["minutes_played"] / 90)
         merged["minutes_played_norm"] = merged["minutes_played"] / merged["minutes_played"].max()
 
@@ -36,11 +36,11 @@ def process_player_data(save_csv=True):
         merged["goals_per90"] = merged["goals"] / (merged["minutes_played"] / 90)
         merged["assists_per90"] = merged["assists"] / (merged["minutes_played"] / 90)
 
-        # 4️⃣ Nettoyage
+        # Nettoyage
         merged = merged.fillna(0)
         merged = merged[merged["minutes_played"] >= 300]  # Écarte les joueurs peu utilisés
 
-        # 5️⃣ Regrouper les positions
+        # Regrouper les positions
         def map_position(pos):
             if pos is None:
                 return "Unknown"
@@ -61,13 +61,13 @@ def process_player_data(save_csv=True):
         merged["nationality"] = merged["nationality"].apply(lambda x: ' '.join(x.split()[1:]) if isinstance(x, str) else x)
 
 
-        print("✅ Transformation terminée")
+        print("  Transformation terminée")
 
-        # 6️⃣ Sauvegarde locale pour inspection
+        # Sauvegarde locale pour inspection
         if save_csv:
             os.makedirs("data", exist_ok=True)
             merged.to_csv("data/processed_players.csv", index=False)
-            print("💾 Fichier sauvegardé : data/processed_players.csv")
+            print("  Fichier sauvegardé : data/processed_players.csv")
 
         return merged
 

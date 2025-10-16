@@ -39,11 +39,11 @@ def predict_upcoming_matches():
             
             prediction = predictor.predict_match(features)
             
-            print(f"🏆 {match['home_team']} vs {match['away_team']}")
-            print(f"   📅 {date_str} | 🏆 {match['competition']}")
-            print(f"   🎯 Prédiction: {prediction['prediction']}")
-            print(f"   📊 Probabilités: Home {prediction['probabilities']['Home']:.1%} | Draw {prediction['probabilities']['Draw']:.1%} | Away {prediction['probabilities']['Away']:.1%}")
-            print(f"   💪 Confiance: {prediction['confidence']:.1%}")
+            print(f"  {match['home_team']} vs {match['away_team']}")
+            print(f"     {date_str} |   {match['competition']}")
+            print(f"     Prédiction: {prediction['prediction']}")
+            print(f"     Probabilités: Home {prediction['probabilities']['Home']:.1%} | Draw {prediction['probabilities']['Draw']:.1%} | Away {prediction['probabilities']['Away']:.1%}")
+            print(f"     Confiance: {prediction['confidence']:.1%}")
             print("-" * 50)
             
             predictions.append({
@@ -70,7 +70,7 @@ def predict_upcoming_matches():
         print(f"Home: {home_wins} | Draw: {draws} | Away: {away_wins}")
         print(f"Confiance moyenne: {sum(p['confidence'] for p in predictions)/len(predictions):.1%}")
     else:
-        print("\n❌ Aucune prédiction n'a pu être calculée")
+        print("\n  Aucune prédiction n'a pu être calculée")
     
     return predictions
 

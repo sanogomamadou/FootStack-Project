@@ -38,7 +38,7 @@ class FBrefSeleniumScraperCorrected:
         from selenium.webdriver.chrome.service import Service
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
-        print("✅ Driver Chrome configuré")
+        print("  Driver Chrome configuré")
     
     def scrape_top_leagues(self, seasons: List[str] = None) -> pd.DataFrame:
         if seasons is None:
@@ -54,32 +54,32 @@ class FBrefSeleniumScraperCorrected:
         
         all_players = []
         for league_name, league_id in leagues.items():
-            logger.info(f"🔍 Scraping {league_name}...")
+            logger.info(f"  Scraping {league_name}...")
             for season in seasons:
                 try:
                     players_data = self._scrape_league_season(league_id, league_name, season)
                     all_players.extend(players_data)
                     time.sleep(self.delay)
                 except Exception as e:
-                    logger.error(f"❌ Erreur {league_name} {season}: {e}")
+                    logger.error(f"  Erreur {league_name} {season}: {e}")
                     continue
         return pd.DataFrame(all_players)
     
     def _scrape_league_season(self, league_id: str, league_name: str, season: str) -> List[Dict]:
         url = f"{self.base_url}/en/comps/{league_id}/{season}/stats/{season}-Stats"
         try:
-            print(f"🌐 Navigation vers: {url}")
+            print(f" Navigation vers: {url}")
             self.driver.get(url)
             wait = WebDriverWait(self.driver, 20)
             wait.until(EC.presence_of_element_located((By.ID, "stats_standard")))
-            print("✅ Page chargée avec succès")
+            print("  Page chargée avec succès")
             self.driver.execute_script("window.scrollTo(0, 500);")
             time.sleep(2)
             players_data = self._parse_standard_stats_corrected(league_name, season)
-            logger.info(f"✅ {league_name} {season}: {len(players_data)} joueurs")
+            logger.info(f"  {league_name} {season}: {len(players_data)} joueurs")
             return players_data
         except Exception as e:
-            logger.error(f"❌ Erreur scraping {league_name} {season}: {e}")
+            logger.error(f"  Erreur scraping {league_name} {season}: {e}")
             return []
     
     def _parse_standard_stats_corrected(self, league_name: str, season: str) -> List[Dict]:
@@ -87,24 +87,24 @@ class FBrefSeleniumScraperCorrected:
         try:
             table = self.driver.find_element(By.ID, "stats_standard")
             rows = table.find_elements(By.CSS_SELECTOR, "tbody tr")
-            print(f"🔍 {len(rows)} lignes trouvées")
+            print(f"  {len(rows)} lignes trouvées")
             successful = 0
             for i, row in enumerate(rows):
                 if i % 50 == 0:
-                    print(f"   📝 Traitement ligne {i}/{len(rows)}...")
+                    print(f"   Traitement ligne {i}/{len(rows)}...")
                 try:
                     player_data = self._extract_player_data_corrected(row, league_name, season, i)
                     if player_data:
                         players.append(player_data)
                         successful += 1
                         if successful <= 3:
-                            print(f"      ✅ {player_data['player_name']} - {player_data['team']} ({player_data['goals']} buts)")
+                            print(f"        {player_data['player_name']} - {player_data['team']} ({player_data['goals']} buts)")
                 except Exception as e:
                     continue
-            print(f"   🎯 {successful} joueurs extraits avec succès")
+            print(f"     {successful} joueurs extraits avec succès")
             return players
         except Exception as e:
-            logger.error(f"❌ Erreur extraction: {e}")
+            logger.error(f"  Erreur extraction: {e}")
             return []
     
     def _extract_player_data_corrected(self, row, league_name: str, season: str, i: int) -> Optional[Dict]:
@@ -114,7 +114,7 @@ class FBrefSeleniumScraperCorrected:
             if len(cells) < 10:
                 return None
 
-            # ✅ Extraction des infos principales
+            #   Extraction des infos principales
             player_name = cells[1].text.strip()
             team = cells[4].text.strip()
             position = cells[3].text.strip()
@@ -159,7 +159,7 @@ class FBrefSeleniumScraperCorrected:
             return stats if minutes_played >= 90 else None
 
         except Exception as e:
-            print(f"⚠️ Erreur ligne {i}: {e}")
+            print(f"  Erreur ligne {i}: {e}")
             return None
     
     def _parse_int(self, text: str) -> int:
@@ -179,24 +179,24 @@ class FBrefSeleniumScraperCorrected:
         """Sauvegarder les joueurs dans la base de données - SOLUTION SIMPLIFIÉE"""
         session = SessionLocal()
         try:
-            # 🔥 ÉTAPE 0 : CRÉER LES TABLES SI ELLES N'EXISTENT PAS
+            #   ÉTAPE 0 : CRÉER LES TABLES SI ELLES N'EXISTENT PAS
             print("🔨 Création des tables si nécessaire...")
             from data_ingest.db import Base, engine
             Base.metadata.create_all(bind=engine)  # Cette ligne crée les tables manquantes
-            print("✅ Tables vérifiées/créées")
-            # 🔥 ÉTAPE 1 : Supprimer les doublons du DataFrame
-            print("🧹 Suppression des doublons...")
+            print("  Tables vérifiées/créées")
+            #   ÉTAPE 1 : Supprimer les doublons du DataFrame
+            print("  Suppression des doublons...")
             players_df_clean = players_df.drop_duplicates(subset=['fbref_id'], keep='first')
-            print(f"📊 Après nettoyage : {len(players_df_clean)} joueurs uniques (sur {len(players_df)} originaux)")
+            print(f"  Après nettoyage : {len(players_df_clean)} joueurs uniques (sur {len(players_df)} originaux)")
             
-            # 🔥 ÉTAPE 2 : Vider les tables existantes (pour repartir à zéro)
-            print("🗑️  Nettoyage des tables existantes...")
+            #   ÉTAPE 2 : Vider les tables existantes (pour repartir à zéro)
+            print("  Nettoyage des tables existantes...")
             session.query(PlayerStats).delete()
             session.query(Player).delete()
             session.commit()
             
-            # 🔥 ÉTAPE 3 : Insertion simple des joueurs
-            print("💾 Insertion des joueurs...")
+            #   ÉTAPE 3 : Insertion simple des joueurs
+            print("  Insertion des joueurs...")
             for _, player_data in players_df_clean.iterrows():
                 clean_data = {}
                 for key, value in player_data.items():
@@ -218,10 +218,10 @@ class FBrefSeleniumScraperCorrected:
                 session.add(player)
             
             session.commit()
-            print(f"✅ {len(players_df_clean)} joueurs insérés")
+            print(f"  {len(players_df_clean)} joueurs insérés")
             
-            # 🔥 ÉTAPE 4 : Ajouter les statistiques
-            print("📈 Ajout des statistiques...")
+            #   ÉTAPE 4 : Ajouter les statistiques
+            print("  Ajout des statistiques...")
             for _, player_data in players_df_clean.iterrows():
                 clean_data = {}
                 for key, value in player_data.items():
@@ -248,13 +248,13 @@ class FBrefSeleniumScraperCorrected:
                         session.add(stats)
             
             session.commit()
-            print(f"📊 {len(players_df_clean)} statistiques ajoutées")
+            print(f"  {len(players_df_clean)} statistiques ajoutées")
             
-            logger.info(f"💾 Sauvegarde terminée : {len(players_df_clean)} joueurs uniques")
+            logger.info(f"  Sauvegarde terminée : {len(players_df_clean)} joueurs uniques")
             
         except Exception as e:
             session.rollback()
-            logger.error(f"❌ Erreur sauvegarde base: {e}")
+            logger.error(f"  Erreur sauvegarde base: {e}")
             import traceback
             traceback.print_exc()
         finally:
@@ -270,9 +270,9 @@ if __name__ == "__main__":
     scraper = None
     try:
         scraper = FBrefSeleniumScraperCorrected(delay=5.0)
-        print("🚀 Début du scraping FBref avec debug structure...")
+        print("  Début du scraping FBref avec debug structure...")
         players_df = scraper.scrape_top_leagues(seasons=["2024-2025"])
-        print(f"✅ {len(players_df)} joueurs scrapés")
+        print(f"  {len(players_df)} joueurs scrapés")
         if len(players_df) > 0:
             # Sauvegarde en base
             scraper.save_to_database(players_df)
@@ -281,18 +281,18 @@ if __name__ == "__main__":
             players_df.to_csv("data/players_stats_complete.csv", index=False)
             
             # Statistiques détaillées
-            print(f"\n🎯 STATISTIQUES COMPLÈTES:")
+            print(f"\n  STATISTIQUES COMPLÈTES:")
             print(f"   • Total joueurs: {len(players_df)}")
             print(f"   • Équipes uniques: {players_df['team'].nunique()}")
             print(f"   • Buts totaux: {players_df['goals'].sum()}")
             print(f"   • Passes décisives: {players_df['assists'].sum()}")
             print(f"   • Minutes totales: {players_df['minutes_played'].sum():,}")
             
-            print(f"\n🏆 TOP 10 BUTEURS:")
+            print(f"\n  TOP 10 BUTEURS:")
             top_scorers = players_df.nlargest(10, 'goals')[['player_name', 'team', 'league', 'goals', 'assists']]
             print(top_scorers.to_string(index=False))
             
-            print(f"\n🎯 TOP 10 PASSEURS:")
+            print(f"\n  TOP 10 PASSEURS:")
             top_assisters = players_df.nlargest(10, 'assists')[['player_name', 'team', 'league', 'goals', 'assists']]
             print(top_assisters.to_string(index=False))
 
