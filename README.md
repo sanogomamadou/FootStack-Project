@@ -92,7 +92,7 @@ graph TB
     E --> F[FastAPI]
     C --> G[Clustering]
     G --> H[Talent Scout]
-    H --> I
+    H --> F
     J[Airflow] --> B
     J --> E
     J --> G
